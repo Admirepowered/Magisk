@@ -45,6 +45,6 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v6
         with:
-          name: ${{ github.sha }}
+          name: x86_64
           path: native/out/x86_64
           compression-level: 9
