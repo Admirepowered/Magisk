@@ -973,16 +973,22 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
     // Update checksum
     if (char *id = hdr->id()) {
         auto ctx = get_sha(!boot.flags[SHA256_FLAG]);
+        fprintf(stderr, "Updating boot image checksum (%s)...\n",
+                boot.flags[SHA256_FLAG] ? "SHA1" : "SHA256");
         uint32_t size = hdr->kernel_size();
+        fprintf(stderr, "%-*s [%u],offset=%lu\n", PADDING, "KERNEL_SZ", size, off.kernel);
         ctx->update(byte_view(out.data() + off.kernel, size));
         ctx->update(byte_view(&size, sizeof(size)));
         size = hdr->ramdisk_size();
+        fprintf(stderr, "%-*s [%u],offset=%lu\n", PADDING, "RAMDISK_SZ", size, off.ramdisk);
         ctx->update(byte_view(out.data() + off.ramdisk, size));
         ctx->update(byte_view(&size, sizeof(size)));
         size = hdr->second_size();
+        fprintf(stderr, "%-*s [%u],offset=%lu\n", PADDING, "SECOND_SZ", size, off.second);
         ctx->update(byte_view(out.data() + off.second, size));
         ctx->update(byte_view(&size, sizeof(size)));
         size = hdr->extra_size();
+        fprintf(stderr, "%-*s [%u],offset=%lu\n", PADDING, "EXTRA_SZ", size, off.extra);
         if (size) {
             ctx->update(byte_view(out.data() + off.extra, size));
             ctx->update(byte_view(&size, sizeof(size)));
@@ -990,11 +996,13 @@ void repack(Utf8CStr src_img, Utf8CStr out_img, bool skip_comp) {
         uint32_t ver = hdr->header_version();
         if (ver == 1 || ver == 2) {
             size = hdr->recovery_dtbo_size();
+            fprintf(stderr, "%-*s [%u],offset=%lu\n", PADDING, "RECOVERY_DTBO_SZ", size, off.recovery_dtbo);
             ctx->update(byte_view(out.data() + hdr->recovery_dtbo_offset(), size));
             ctx->update(byte_view(&size, sizeof(size)));
         }
         if (ver == 2) {
             size = hdr->dtb_size();
+            fprintf(stderr, "%-*s [%u],offset=%lu\n", PADDING, "DTB_SZ", size, off.dtb);
             ctx->update(byte_view(out.data() + off.dtb, size));
             ctx->update(byte_view(&size, sizeof(size)));
         }
